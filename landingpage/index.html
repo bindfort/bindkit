@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bindkit — Production MCP Server Starter Kit for Go</title>
+<meta name="description" content="Ship a monetizable MCP server this weekend. Auth, billing, metering, rate limiting and CI — wired up. You write the tools.">
+<style>
+  :root{
+    --bg:#0B1217;
+    --panel:#121A21;
+    --panel2:#0F161C;
+    --line:#1E2A33;
+    --ink:#E6EDF3;
+    --muted:#7E8B99;
+    --cyan:#5AC8E8;
+    --amber:#E8A33D;
+    --green:#6FD08C;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+    --mono:ui-monospace,'JetBrains Mono','Fira Code',Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;font-size:16px}
+  a{color:var(--cyan);text-decoration:none}
+  .wrap{max-width:1020px;margin:0 auto;padding:0 20px}
+
+  /* nav */
+  nav{display:flex;justify-content:space-between;align-items:center;padding:18px 0}
+  .logo{font-family:var(--mono);font-weight:700;font-size:17px;color:var(--ink)}
+  .logo span{color:var(--cyan)}
+  .btn{
+    display:inline-block;font-weight:600;font-size:14.5px;
+    padding:10px 18px;border-radius:8px;border:1px solid var(--line);
+    color:var(--ink);transition:transform .12s ease,border-color .12s;
+  }
+  .btn:hover{border-color:var(--cyan)}
+  .btn.primary{background:var(--amber);border-color:var(--amber);color:#14110A}
+  .btn.primary:hover{transform:translateY(-1px)}
+  .btn:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+
+  /* hero */
+  .hero{display:grid;grid-template-columns:1.05fr 1fr;gap:40px;align-items:center;padding:56px 0 64px}
+  @media(max-width:820px){.hero{grid-template-columns:1fr;padding:36px 0 48px}}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan);margin-bottom:14px}
+  h1{font-size:clamp(30px,4.6vw,44px);line-height:1.12;letter-spacing:-.02em;font-weight:800;margin-bottom:16px}
+  h1 em{font-style:normal;color:var(--cyan)}
+  .lede{color:var(--muted);font-size:17px;max-width:46ch;margin-bottom:26px}
+  .cta-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .cta-note{font-family:var(--mono);font-size:12px;color:var(--muted)}
+
+  /* terminal */
+  .term{
+    background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    box-shadow:0 24px 60px rgba(0,0,0,.45);overflow:hidden;
+  }
+  .term-bar{display:flex;gap:6px;padding:11px 14px;border-bottom:1px solid var(--line)}
+  .term-bar i{width:10px;height:10px;border-radius:50%;background:var(--line)}
+  .term-bar i:first-child{background:#C75450}
+  .term-bar i:nth-child(2){background:var(--amber)}
+  .term-bar i:nth-child(3){background:var(--green)}
+  .term-body{font-family:var(--mono);font-size:13px;line-height:1.75;padding:18px 18px 22px;min-height:230px;white-space:pre-wrap}
+  .t-cmd{color:var(--ink)}
+  .t-cmd::before{content:"$ ";color:var(--cyan)}
+  .t-out{color:var(--muted)}
+  .t-ok{color:var(--green)}
+  .cursor{display:inline-block;width:8px;height:15px;background:var(--cyan);vertical-align:-2px;animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  @media(prefers-reduced-motion:reduce){.cursor{animation:none}}
+
+  /* proof strip */
+  .proof{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding-bottom:64px}
+  @media(max-width:680px){.proof{grid-template-columns:1fr}}
+  .proof div{
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:18px;font-size:14px;color:var(--muted);
+  }
+  .proof b{display:block;font-family:var(--mono);font-size:22px;color:var(--ink);margin-bottom:2px}
+  .proof b.hl{color:var(--cyan)}
+
+  /* sections */
+  section{padding:0 0 72px}
+  h2{font-size:clamp(22px,3vw,30px);letter-spacing:-.015em;font-weight:800;margin-bottom:8px}
+  .sec-sub{color:var(--muted);max-width:58ch;margin-bottom:30px}
+
+  /* inside: file tree */
+  .inside{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
+  @media(max-width:820px){.inside{grid-template-columns:1fr}}
+  .tree{
+    background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    font-family:var(--mono);font-size:13px;line-height:1.8;padding:20px;color:var(--muted);
+    white-space:pre;overflow-x:auto;
+  }
+  .tree b{color:var(--ink);font-weight:600}
+  .tree .c{color:var(--cyan)}
+  .inside-points{display:flex;flex-direction:column;gap:16px}
+  .point h3{font-size:15.5px;font-weight:700;margin-bottom:2px}
+  .point h3 code{font-family:var(--mono);font-size:13px;color:var(--cyan);background:var(--panel);padding:2px 6px;border-radius:5px}
+  .point p{color:var(--muted);font-size:14.5px}
+
+  /* features */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:820px){.grid{grid-template-columns:1fr 1fr}}
+  @media(max-width:560px){.grid{grid-template-columns:1fr}}
+  .card{
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:20px;
+  }
+  .card h3{font-size:15px;font-weight:700;margin-bottom:6px}
+  .card h3::before{content:"▸ ";color:var(--cyan)}
+  .card p{color:var(--muted);font-size:14px}
+
+  /* pricing */
+  .prices{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:720px}
+  @media(max-width:680px){.prices{grid-template-columns:1fr}}
+  .price{
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:26px 24px;
+    display:flex;flex-direction:column;gap:14px;
+  }
+  .price.featured{border-color:var(--amber)}
+  .price .tier{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .price .amount{font-size:38px;font-weight:800;letter-spacing:-.02em}
+  .price .amount s{color:var(--muted);font-size:20px;font-weight:500;margin-left:8px}
+  .price ul{list-style:none;display:flex;flex-direction:column;gap:8px;font-size:14.5px;color:var(--muted)}
+  .price li::before{content:"✓ ";color:var(--green)}
+  .price .btn{text-align:center;margin-top:auto}
+
+  /* faq */
+  details{border-bottom:1px solid var(--line);padding:16px 0}
+  summary{cursor:pointer;font-weight:600;font-size:15.5px;list-style:none;display:flex;justify-content:space-between;gap:12px}
+  summary::after{content:"+";color:var(--cyan);font-family:var(--mono)}
+  details[open] summary::after{content:"–"}
+  details p{color:var(--muted);font-size:14.5px;padding-top:10px;max-width:64ch}
+
+  footer{
+    border-top:1px solid var(--line);padding:28px 0 48px;
+    color:var(--muted);font-size:13.5px;
+  }
+  footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav>
+    <div class="logo">bind<span>kit</span></div>
+    <a class="btn primary" href="#pricing">Get Bindkit — $129</a>
+  </nav>
+
+  <div class="hero">
+    <div>
+      <div class="eyebrow">MCP server starter kit · Go</div>
+      <h1>Ship a <em>monetizable</em> MCP server this weekend.</h1>
+      <p class="lede">Auth, billing, metering, rate limiting, logging, Docker and CI — already wired. You write the tools. Bindkit is the boring 80% of a paid MCP server, finished.</p>
+      <div class="cta-row">
+        <a class="btn primary" href="#pricing">Get the kit</a>
+        <a class="btn" href="#inside">See what's inside</a>
+      </div>
+      <p class="cta-note" style="margin-top:14px">One-time purchase · unlimited servers · keep 100% of your revenue</p>
+    </div>
+
+    <div class="term" aria-label="Terminal demo">
+      <div class="term-bar"><i></i><i></i><i></i></div>
+      <div class="term-body" id="term"></div>
+    </div>
+  </div>
+
+  <div class="proof">
+    <div><b class="hl">11,000+</b>MCP servers exist. Fewer than 5% earn a dollar. The gap isn't ideas — it's billing plumbing.</div>
+    <div><b>5 min</b>from unzip to a running server your Claude or Cursor client can call.</div>
+    <div><b>&lt;20 MB</b>distroless Docker image. Deploys to Fly.io with one command.</div>
+  </div>
+
+  <section id="inside">
+    <h2>What's inside</h2>
+    <p class="sec-sub">A real Go project layout, not a demo. Every package is tested, and the example tool runs end-to-end out of the box.</p>
+    <div class="inside">
+<div class="tree"><b>bindkit/</b>
+├── cmd/server/        <span class="c"># entrypoint, graceful shutdown</span>
+├── internal/
+│   ├── auth/          <span class="c"># API keys + OAuth 2.1 bearer</span>
+│   ├── billing/       <span class="c"># Stripe subs + usage stubs</span>
+│   ├── config/        <span class="c"># typed, validated, loud errors</span>
+│   ├── logging/       <span class="c"># slog JSON, secret redaction</span>
+│   ├── metering/      <span class="c"># per-key usage counters</span>
+│   ├── ratelimit/     <span class="c"># token bucket per key/tool</span>
+│   └── server/        <span class="c"># stdio + streamable HTTP</span>
+├── tools/example_weather/
+├── deploy/            <span class="c"># Dockerfile · fly.toml · compose</span>
+├── .github/workflows/ <span class="c"># lint · test · release</span>
+└── Makefile           <span class="c"># new-tool · dev · release</span></div>
+      <div class="inside-points">
+        <div class="point">
+          <h3><code>make new-tool name=invoice_lookup</code></h3>
+          <p>Scaffolds a typed tool with input schema, handler and test file. Your weekend goes into tool logic, not wiring.</p>
+        </div>
+        <div class="point">
+          <h3>Billing that matches how MCP sells</h3>
+          <p>Free tier via bring-your-own-key. Paid tier via keys you issue, metered per call, billed through Stripe. Flip one config flag to go live.</p>
+        </div>
+        <div class="point">
+          <h3>Abuse protection by default</h3>
+          <p>Token-bucket rate limits per key and per tool, so one runaway agent loop can't torch your hosting bill.</p>
+        </div>
+        <div class="point">
+          <h3>Monetization playbook included</h3>
+          <p>docs/ covers pricing splits that convert, the registries and marketplaces to list on, and client setup snippets for Claude, Cursor, Windsurf and Cline.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Everything wired, nothing to untangle</h2>
+    <p class="sec-sub">Built by the team behind Bindfort, the MCP security gateway — the same patterns we run in production.</p>
+    <div class="grid">
+      <div class="card"><h3>Spec-current MCP</h3><p>stdio for local clients, streamable HTTP for hosted. Free spec-revision updates for 12 months.</p></div>
+      <div class="card"><h3>Auth middleware</h3><p>API-key and OAuth 2.1 bearer flows, ready for both indie and enterprise clients.</p></div>
+      <div class="card"><h3>Usage metering</h3><p>Every call counted per key. In-memory for one box, Redis for fleets.</p></div>
+      <div class="card"><h3>Config validation</h3><p>Typed config that fails loudly at startup with line-level errors — not at 2 a.m. in prod.</p></div>
+      <div class="card"><h3>Structured logging</h3><p>slog JSON with request IDs and automatic secret redaction. Pipe it anywhere.</p></div>
+      <div class="card"><h3>CI & release</h3><p>GitHub Actions for lint, test, build and tagged releases. Green from the first push.</p></div>
+    </div>
+  </section>
+
+  <section id="pricing">
+    <h2>Pricing</h2>
+    <p class="sec-sub">One-time purchase. Unlimited servers, unlimited revenue — yours to keep.</p>
+    <div class="prices">
+      <div class="price featured">
+        <div class="tier">Solo</div>
+        <div class="amount">$129 <s>$179</s></div>
+        <ul>
+          <li>1 developer, unlimited servers</li>
+          <li>Full source, commercial license</li>
+          <li>Monetization playbook docs</li>
+          <li>12 months of updates</li>
+        </ul>
+        <a class="btn primary" href="YOUR_PAYMENT_LINK">Get Solo — $129</a>
+      </div>
+      <div class="price">
+        <div class="tier">Team</div>
+        <div class="amount">$349</div>
+        <ul>
+          <li>Up to 5 developers</li>
+          <li>Everything in Solo</li>
+          <li>Priority email support</li>
+          <li>Invoice with EU VAT</li>
+        </ul>
+        <a class="btn" href="YOUR_PAYMENT_LINK_TEAM">Get Team — $349</a>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Questions</h2>
+    <details>
+      <summary>Do I keep the revenue from servers I build with this?</summary>
+      <p>All of it. The license covers the template itself — anything you build and sell with it is 100% yours. The only restriction is reselling or redistributing the template as a template.</p>
+    </details>
+    <details>
+      <summary>Which MCP clients does it work with?</summary>
+      <p>Anything that speaks MCP: Claude (Desktop and claude.ai), Cursor, Windsurf, Cline and others. Connection snippets for each are in docs/clients.md.</p>
+    </details>
+    <details>
+      <summary>I've never charged for software. Will this actually get me to revenue?</summary>
+      <p>The kit removes the technical blockers — keys, metering, Stripe. The included playbook covers the rest: the free/hosted pricing split that converts, and where to list so buyers find you. You still have to ship and post it; the kit makes that a weekend instead of a quarter.</p>
+    </details>
+    <details>
+      <summary>What do I need to run it?</summary>
+      <p>Go 1.23+. Docker and Redis are optional — in-memory metering works fine on a single instance.</p>
+    </details>
+    <details>
+      <summary>Refunds?</summary>
+      <p>14 days, no questions. If the kit doesn't save you a weekend, you shouldn't pay for it.</p>
+    </details>
+  </section>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div>© 2026 Bindkit. Built by the team behind <a href="https://bindfort.com">Bindfort</a> — runtime security for MCP agent tool calls.</div>
+    <div><a href="mailto:support@bindfort.com">support@bindfort.com</a></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  const lines=[
+    ["cmd","make dev"],
+    ["out","bindkit ▸ config ok · auth ok · metering ok"],
+    ["ok","✓ MCP server listening on :8080 (streamable http)"],
+    ["cmd","make new-tool name=invoice_lookup"],
+    ["ok","✓ tools/invoice_lookup created (handler + schema + test)"],
+    ["cmd","make release && fly deploy"],
+    ["ok","✓ deployed — first paid tool call: 00:04:51"]
+  ];
+  const el=document.getElementById("term");
+  const reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const cls={cmd:"t-cmd",out:"t-out",ok:"t-ok"};
+
+  if(reduced){
+    el.innerHTML=lines.map(l=>`<div class="${cls[l[0]]}">${l[1]}</div>`).join("");
+    return;
+  }
+  let li=0;
+  function typeLine(){
+    if(li>=lines.length){el.insertAdjacentHTML("beforeend",'<span class="cursor"></span>');return}
+    const [kind,text]=lines[li];
+    const div=document.createElement("div");
+    div.className=cls[kind];
+    el.appendChild(div);
+    if(kind==="cmd"){
+      let ci=0;
+      const t=setInterval(()=>{
+        div.textContent=text.slice(0,++ci);
+        if(ci>=text.length){clearInterval(t);li++;setTimeout(typeLine,420)}
+      },34);
+    }else{
+      div.textContent=text;
+      li++;setTimeout(typeLine,520);
+    }
+  }
+  typeLine();
+})();
+</script>
+</body>
+</html>

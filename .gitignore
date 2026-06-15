@@ -1,0 +1,10 @@
+# Build output / packaging
+/dist/
+*.exe
+
+# Logs
+*.log
+
+# OS cruft
+.DS_Store
+Thumbs.db

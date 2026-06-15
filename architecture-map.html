@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bindkit - Architecture Map</title>
+  <style>
+    :root {
+      --bg: #0b1217;
+      --panel: #121a21;
+      --panel2: #0e161c;
+      --line: #1e2a33;
+      --line2: #2a3a45;
+      --ink: #e6edf3;
+      --muted: #7e8b99;
+      --cyan: #5ac8e8;
+      --amber: #e8a33d;
+      --green: #6fd08c;
+      --violet: #9d8cff;
+      --red: #e0716b;
+      --mono: ui-monospace, "JetBrains Mono", "Fira Code", Menlo, Consolas, monospace;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 22px 16px 70px;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      line-height: 1.55;
+    }
+    .eyebrow {
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+    h1 { margin: 6px 0 4px; font-size: 24px; font-weight: 800; }
+    .sub { max-width: 64ch; color: var(--muted); font-size: 13.5px; }
+    h2 { display: flex; align-items: center; gap: 9px; margin: 30px 0 14px; font-size: 14px; }
+    h2::before { content: ""; width: 5px; height: 16px; border-radius: 2px; background: var(--cyan); }
+    .flow, .comp, .chk, .matrix { border: 1px solid var(--line); background: var(--panel); }
+    .flow { overflow-x: auto; padding: 20px 18px; border-radius: 14px; }
+    .pipe { display: flex; align-items: stretch; min-width: 760px; }
+    .stage {
+      position: relative;
+      flex: 1;
+      min-width: 96px;
+      padding: 12px 10px;
+      border: 1px solid var(--line2);
+      border-radius: 10px;
+      background: var(--panel2);
+      text-align: center;
+    }
+    .stage .ico { margin-bottom: 6px; color: var(--cyan); font-family: var(--mono); font-size: 16px; }
+    .stage .nm { font-size: 12px; font-weight: 700; }
+    .stage .pk { margin-top: 3px; color: var(--muted); font-family: var(--mono); font-size: 9.5px; }
+    .stage.gate { border-color: rgba(224,113,107,.4); }
+    .stage.gate .ico { color: var(--red); }
+    .stage.term { border-color: rgba(111,208,140,.4); }
+    .stage.term .ico { color: var(--green); }
+    .arrow { display: flex; align-items: center; flex: 0 0 auto; padding: 0 4px; color: var(--muted); font-family: var(--mono); }
+    .flow-note { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 14px; color: var(--muted); font-size: 11px; }
+    .dot { display: inline-block; width: 8px; height: 8px; margin-right: 5px; border-radius: 50%; vertical-align: 1px; }
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+    .tree {
+      overflow-x: auto;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel2);
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 12.5px;
+      line-height: 1.9;
+      white-space: pre;
+    }
+    .tree .dir { color: var(--ink); font-weight: 600; }
+    .tree .c { color: var(--cyan); }
+    .tree .g { color: var(--green); }
+    .tree .v { color: var(--violet); }
+    .stack { display: flex; flex-direction: column; gap: 10px; }
+    .comp { padding: 13px 14px; border-radius: 10px; }
+    .comp h3 { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 13px; }
+    .tag { padding: 2px 6px; border-radius: 4px; color: #0b1217; font-size: 9px; letter-spacing: .08em; text-transform: uppercase; }
+    .t-core { background: var(--cyan); }
+    .t-mw { background: var(--amber); }
+    .t-pay { background: var(--green); }
+    .comp p { margin-top: 5px; color: var(--muted); font-size: 12.5px; }
+    .matrix { width: 100%; border-collapse: collapse; overflow: hidden; border-radius: 12px; font-size: 12.5px; }
+    .matrix th, .matrix td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; }
+    .matrix th { color: var(--muted); font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; }
+    .matrix td:first-child { color: var(--cyan); font-family: var(--mono); font-size: 11.5px; }
+    .matrix tr:last-child td { border-bottom: 0; }
+    .def { color: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .checks { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .chk { padding: 12px 14px; border-left: 3px solid var(--amber); border-radius: 8px; }
+    .chk .d { color: var(--amber); font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
+    .chk p { margin-top: 4px; color: var(--ink); font-size: 12.5px; }
+    .chk.done { border-left-color: var(--green); opacity: .75; }
+    .chk.done .d { color: var(--green); }
+    footer { margin-top: 30px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--muted); font-family: var(--mono); font-size: 11.5px; }
+    @media (max-width: 760px) { .cols, .checks { grid-template-columns: 1fr; } .pipe { min-width: 680px; } }
+  </style>
+</head>
+<body>
+  <div class="eyebrow">Go / MCP server starter kit</div>
+  <h1>Bindkit architecture map</h1>
+  <p class="sub">How a tool call travels through the kit, what every package does, and what is left for the weekend. The middleware pipeline is the heart of it: it turns a hobby MCP server into one you can charge for.</p>
+
+  <h2>Request lifecycle - one <code>tools/call</code></h2>
+  <div class="flow">
+    <div class="pipe">
+      <div class="stage"><div class="ico">C</div><div class="nm">Client</div><div class="pk">Claude / Cursor</div></div>
+      <div class="arrow">-&gt;</div>
+      <div class="stage"><div class="ico">T</div><div class="nm">Transport</div><div class="pk">stdio / http</div></div>
+      <div class="arrow">-&gt;</div>
+      <div class="stage gate"><div class="ico">A</div><div class="nm">Auth</div><div class="pk">internal/auth</div></div>
+      <div class="arrow">-&gt;</div>
+      <div class="stage gate"><div class="ico">R</div><div class="nm">Rate limit</div><div class="pk">ratelimit</div></div>
+      <div class="arrow">-&gt;</div>
+      <div class="stage gate"><div class="ico">B</div><div class="nm">Billing</div><div class="pk">billing</div></div>
+      <div class="arrow">-&gt;</div>
+      <div class="stage"><div class="ico">D</div><div class="nm">Dispatch</div><div class="pk">mcp</div></div>
+      <div class="arrow">-&gt;</div>
+      <div class="stage term"><div class="ico">*</div><div class="nm">Your tool</div><div class="pk">tools/*</div></div>
+    </div>
+    <div class="flow-note">
+      <span><span class="dot" style="background:var(--red)"></span><b>Gates</b> can reject: out of quota, over rate, bad key</span>
+      <span><span class="dot" style="background:var(--green)"></span><b>Tool</b> returns text; result is metered on the way out</span>
+      <span><span class="dot" style="background:var(--cyan)"></span><code>initialize</code> and <code>tools/list</code> skip the gates</span>
+    </div>
+  </div>
+
+  <h2>Package map</h2>
+  <div class="cols">
+    <div class="tree"><span class="dir">bindkit/</span>
+|-- cmd/server/         <span class="c"># main: load -> wire -> serve</span>
+|-- internal/
+|   |-- <span class="dir">mcp/</span>            <span class="c"># protocol, registry, dispatch</span>
+|   |-- <span class="dir">server/</span>         <span class="c"># pipeline + stdio + http</span>
+|   |-- <span class="dir">auth/</span>           <span class="c"># key -> principal</span>
+|   |-- <span class="dir">ratelimit/</span>      <span class="c"># token bucket per key</span>
+|   |-- <span class="dir">metering/</span>       <span class="c"># memory + redis counters</span>
+|   |-- <span class="dir">billing/</span>        <span class="c"># quota + Stripe stubs</span>
+|   |-- <span class="dir">config/</span>         <span class="c"># typed, validated env</span>
+|   `-- <span class="dir">logging/</span>        <span class="c"># slog + redaction</span>
+|-- <span class="dir">tools/</span>
+|   `-- example_weather/ <span class="g"># copy this shape</span>
+|-- deploy/             <span class="c"># Dockerfile / fly / compose</span>
+|-- docs/               <span class="c"># clients / pricing / launch</span>
+|-- scripts/new_tool.sh <span class="v"># make new-tool</span>
+`-- Makefile / CI / go.mod</div>
+    <div class="stack">
+      <div class="comp"><h3><span class="tag t-core">core</span>mcp</h3><p>JSON-RPC framing, Handler interface, concurrent tool registry, and dispatcher for initialize, tools/list, and tools/call.</p></div>
+      <div class="comp"><h3><span class="tag t-core">core</span>server</h3><p>Glues middleware around the dispatcher and serves over stdio or HTTP with graceful shutdown.</p></div>
+      <div class="comp"><h3><span class="tag t-mw">gate</span>auth / ratelimit / billing</h3><p>Resolve API keys, throttle per key, and enforce monthly quota before expensive tool execution.</p></div>
+      <div class="comp"><h3><span class="tag t-pay">infra</span>metering / config / logging</h3><p>Usage counters, env validation that fails loudly, and structured logs with secret redaction.</p></div>
+    </div>
+  </div>
+
+  <h2>Flip-a-flag configuration</h2>
+  <table class="matrix">
+    <tr><th>Env var</th><th>What it switches</th><th class="def">Default</th></tr>
+    <tr><td>BINDKIT_TRANSPORT</td><td>stdio for desktop clients, http for hosting</td><td class="def">stdio</td></tr>
+    <tr><td>BINDKIT_AUTH_ENABLED</td><td>require a bearer API key per call</td><td class="def">false</td></tr>
+    <tr><td>BINDKIT_METERING</td><td>memory on one box, Redis for a fleet</td><td class="def">memory</td></tr>
+    <tr><td>BINDKIT_BILLING_ENABLED</td><td>enforce Stripe quotas or run flat-rate</td><td class="def">false</td></tr>
+    <tr><td>BINDKIT_RATE_PER_MIN</td><td>token refill rate per key</td><td class="def">60</td></tr>
+  </table>
+
+  <h2>Your weekend, mapped</h2>
+  <div class="checks">
+    <div class="chk done"><div class="d">Done by the kit</div><p>Protocol, pipeline, transports, metering, rate limit, tests, Docker, CI, docs.</p></div>
+    <div class="chk done"><div class="d">Done by the kit</div><p><code>make new-tool name=x</code> scaffolds a typed tool and test.</p></div>
+    <div class="chk"><div class="d">Sat / you</div><p>Run <code>go mod tidy && make test</code>; swap hand-rolled Redis client for go-redis.</p></div>
+    <div class="chk"><div class="d">Sat / you</div><p>Replace weather stub with the first real boring B2B tool.</p></div>
+    <div class="chk"><div class="d">Sun / you</div><p>Wire Stripe stubs; set plans and prices in billing.go.</p></div>
+    <div class="chk"><div class="d">Next week</div><p>List on registries, post to r/mcp, Show HN, and dev.to.</p></div>
+  </div>
+
+  <footer>Bindkit / runtime-secured MCP server starter kit / built alongside Bindfort.</footer>
+</body>
+</html>
