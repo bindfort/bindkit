@@ -4,7 +4,7 @@
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/bindfort/bindkit/badge)](https://scorecard.dev/viewer/?uri=github.com/bindfort/bindkit)
 [![License](https://img.shields.io/github/license/bindfort/bindkit)](LICENSE)
 
-![BindKit social preview](assets/bindkit-social.svg)
+![BindKit social preview](assets/bindkit-social-preview.png)
 
 **Open-source Go starter kit for production-shaped MCP servers.**
 
