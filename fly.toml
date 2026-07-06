@@ -1,4 +1,5 @@
-app = "bindkit"
+# Rename this before deploying; Fly app names are globally unique.
+app = "bindkit-example"
 primary_region = "waw"
 
 [build]
@@ -14,4 +15,3 @@ primary_region = "waw"
   auto_stop_machines = true
   auto_start_machines = true
   min_machines_running = 0
-

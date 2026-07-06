@@ -1,0 +1,12 @@
+.git
+dist
+tmp
+
+*.exe
+*.log
+
+.env
+.env.*
+
+.DS_Store
+Thumbs.db

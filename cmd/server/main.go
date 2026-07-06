@@ -32,8 +32,8 @@ func main() {
 
 	registry := mcp.NewRegistry()
 	for _, register := range []func(*mcp.Registry) error{
-		urlcheck.Register,        // real B2B tool
-		example_weather.Register, // demo tool
+		urlcheck.Register,        // production-shaped example tool
+		example_weather.Register, // minimal demo tool
 	} {
 		if err := register(registry); err != nil {
 			logger.Error("register tools", "error", err)

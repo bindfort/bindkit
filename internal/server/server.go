@@ -180,7 +180,7 @@ func HTTPHandler(handler Handler, webhook ...http.Handler) http.Handler {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Bindkit local server</title>
+  <title>BindKit local server</title>
   <style>
     body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b1217;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
     main{width:min(720px,calc(100% - 32px));border:1px solid #1e2a33;border-radius:14px;background:#121a21;padding:28px}
@@ -190,12 +190,12 @@ func HTTPHandler(handler Handler, webhook ...http.Handler) http.Handler {
 </head>
 <body>
   <main>
-    <h1>Bindkit local MCP server</h1>
+    <h1>BindKit local MCP server</h1>
     <p>This is the local API server. Use <code>POST /mcp</code> for MCP JSON-RPC calls and <code>GET /healthz</code> for health checks.</p>
-    <p>The public landing page route runs in the Next app at <code>http://127.0.0.1:3000/bindkit</code>.</p>
+    <p>Project docs live in the repository README. Use this page only to confirm the local server is running.</p>
     <div class="row">
       <a class="primary" href="/healthz">Health check</a>
-      <a href="http://127.0.0.1:3000/bindkit">Open landing page</a>
+      <a href="https://modelcontextprotocol.io" rel="noreferrer">MCP docs</a>
     </div>
   </main>
 </body>

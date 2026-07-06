@@ -1,8 +1,7 @@
-// Package urlcheck is a real, self-contained Bindkit tool: it probes an HTTP(S)
-// endpoint and reports status, latency, and security-header posture. It is the
-// kind of tool an MCP agent actually calls, and it demonstrates the patterns a
-// paid tool needs: typed input, validation, timeouts, SSRF guarding, structured
-// output, and clear errors.
+// Package urlcheck provides a self-contained BindKit tool: it probes an HTTP(S)
+// endpoint and reports status, latency, and security-header posture. It
+// demonstrates production tool patterns: typed input, validation, timeouts,
+// SSRF guarding, structured output, and clear errors.
 package urlcheck
 
 import (

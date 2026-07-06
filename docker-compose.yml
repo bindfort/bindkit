@@ -5,8 +5,4 @@ services:
       - "8080:8080"
     environment:
       BINDKIT_TRANSPORT: http
-      BINDKIT_AUTH_ENABLED: "true"
-      BINDKIT_API_KEYS: "dev-key:free"
-      BINDKIT_BILLING_ENABLED: "true"
-      BINDKIT_PLAN_QUOTAS: "free:100,pro:10000"
-
+      BINDKIT_HTTP_ADDR: :8080

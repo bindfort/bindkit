@@ -29,7 +29,7 @@ func current(_ context.Context, call mcp.CallRequest) (mcp.CallResult, error) {
 	return mcp.CallResult{
 		Content: []mcp.Content{{
 			Type: "text",
-			Text: fmt.Sprintf("%s: 21C, clear enough for a Bindkit demo.", city),
+			Text: fmt.Sprintf("%s: 21C, clear enough for a BindKit demo.", city),
 		}},
 	}, nil
 }
