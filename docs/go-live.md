@@ -1,107 +1,95 @@
-# Bindkit go-live runbook
+# BindKit open-source release checklist
 
-Everything you need to take Bindkit from "code on disk" to "selling at bindkit.dev."
+Use this checklist before publishing a public repository or announcing a new
+release.
 
-## What is now real in the code
-
-These were the claims-vs-reality gaps; they are now implemented and tested
-(`go test ./...` is green):
-
-| Claim | Where it lives |
-|---|---|
-| OAuth 2.1 bearer auth | `internal/auth/oauth.go` — JWT validation against the provider JWKS (issuer, audience, expiry, signature). RS256/384/512. |
-| Stripe metered billing | `internal/billing/stripe.go` — batched usage reported to Stripe Billing Meter Events. |
-| Stripe webhook reconciliation | `internal/billing/webhook.go` — HMAC-SHA256 signature verification + revenue-event hook to revoke access. |
-| Streamable HTTP | `internal/server/server.go` — `/mcp` returns SSE when the client sends `Accept: text/event-stream`, JSON otherwise. |
-| Real B2B tool | `tools/url_check/` — `url.check` (status, latency, security headers, SSRF-guarded). |
-| <20 MB distroless image | `Dockerfile` — stripped static binary (~6 MB) on `gcr.io/distroless/static` (~8 MB total). |
-| Per-key/per-tool rate limits | `internal/ratelimit/` — token bucket with idle-bucket eviction. |
-| Loud config validation | `internal/config/` — fails at startup on misconfig. |
-
-## 1. Configure the server (env)
+## 1. Verify the code
 
 ```bash
-BINDKIT_TRANSPORT=http
-BINDKIT_HTTP_ADDR=:8080
-BINDKIT_AUTH_ENABLED=true
-
-# --- Auth: static keys OR oauth ---
-BINDKIT_AUTH_MODE=oauth            # or "static"
-BINDKIT_OAUTH_ISSUER=https://YOUR_TENANT.auth0.com/
-BINDKIT_OAUTH_JWKS_URL=https://YOUR_TENANT.auth0.com/.well-known/jwks.json
-BINDKIT_OAUTH_AUDIENCE=bindkit-api
-BINDKIT_OAUTH_PLAN_CLAIM=plan      # claim that carries the plan name
-# (static mode instead:) BINDKIT_API_KEYS=key1:pro,key2:free
-
-# --- Billing (Stripe usage-based) ---
-BINDKIT_BILLING_ENABLED=true
-STRIPE_SECRET_KEY=sk_live_xxx
-STRIPE_METER_EVENT=tool_call       # the meter's event_name in Stripe
-STRIPE_WEBHOOK_SECRET=whsec_xxx
-BINDKIT_STRIPE_REPORT_EVERY=60     # seconds between usage flushes
-
-BINDKIT_RATE_PER_MIN=120
-BINDKIT_PLAN_QUOTAS=free:100,pro:100000
+go test ./...
+docker build -t bindkit .
 ```
 
-Map the OAuth `sub` (or static key) to the **Stripe customer id** so usage is
-billed to the right customer. Point the Stripe webhook at `POST /stripe/webhook`.
+Check that:
 
-## 2. Set up Lemon Squeezy (payments + VAT + fulfillment)
+- auth tests pass for static API keys and OAuth bearer tokens;
+- Stripe webhook signature verification tests pass;
+- `url.check` SSRF guard tests pass;
+- HTTP and stdio transport tests pass;
+- docs still match the current environment variables.
 
-Lemon Squeezy is the Merchant of Record — it handles EU VAT, invoices, license
-keys, and the download email, so you don't.
+## 2. Verify the open-source package
 
-1. Create a store, then two **products/variants**: **Solo $129**, **Team $349**.
-2. Turn on **license keys** (1 activation for Solo, 5 for Team) if you want to
-   enforce seats; enable the **file download** of the kit zip (see step 4) as the
-   fulfillment asset.
-3. Copy each variant's **checkout URL** (`https://YOURSTORE.lemonsqueezy.com/buy/<id>`).
-4. Wire them into the landing page via env at build time:
-   ```
-   NEXT_PUBLIC_BINDKIT_SOLO_CHECKOUT_URL=https://YOURSTORE.lemonsqueezy.com/buy/<solo-id>
-   NEXT_PUBLIC_BINDKIT_TEAM_CHECKOUT_URL=https://YOURSTORE.lemonsqueezy.com/buy/<team-id>
-   ```
-   (Or replace the placeholders at the top of `src/app/bindkit/page.tsx`.)
+- [x] Apache-2.0 `LICENSE` file exists.
+- [x] `NOTICE` file exists.
+- [x] `THIRD_PARTY_NOTICES.md` records direct dependency licenses.
+- [x] `CONTRIBUTING.md` explains contribution licensing.
+- [x] `SECURITY.md` explains coordinated disclosure.
+- [x] `CODE_OF_CONDUCT.md` sets the contributor standard.
+- [ ] No built binaries, logs, secrets, or local packaging output are tracked.
+- [ ] `git status --short` is reviewed before publishing.
 
-## 3. Package the deliverable
+## 3. Tag a release
+
+Recommended first public tags:
 
 ```bash
-# from the bindkit/ repo root
-pwsh scripts/package.ps1      # Windows  -> dist/bindkit-<version>.zip
-./scripts/package.sh          # mac/linux/git-bash
+git tag -a v0.1.0 -m "BindKit v0.1.0"
+git push origin main --tags
 ```
 
-The script runs the tests, then zips the source **excluding** internal files
-(`handoff.json`, `agent.md`, `tasks.md`, logs, build output, the landing page).
-Upload `dist/bindkit-<version>.zip` as the Lemon Squeezy download asset.
+Use `v0.x` until the public API, config variables, and tool scaffolding are
+stable enough for a `v1.0.0` compatibility promise.
 
-## 4. Publish the landing page (bindkit.dev)
+## 4. Release notes
 
-The page is the `/bindkit` route in the Next app. To serve it at **bindkit.dev**:
+Suggested first release headline:
 
-- Point `bindkit.dev` DNS at your host (the metadata/canonical already use it).
-- Build & deploy with the checkout env vars set:
-  ```
-  NEXT_PUBLIC_BINDKIT_SOLO_CHECKOUT_URL=... NEXT_PUBLIC_BINDKIT_TEAM_CHECKOUT_URL=... npm run build
-  ```
-- (Optional) Replace the SVG OG image with a 1200×630 PNG for better social cards.
+> BindKit is an Apache-2.0 Go starter kit for production-shaped MCP servers:
+> stdio and HTTP transports, streamable HTTP, static or OAuth auth, metering,
+> rate limits, quotas, Stripe usage hooks, Docker, and CI.
 
-## 5. Pre-launch checklist
+Call out:
 
-- [x] Claims match the code (OAuth, Stripe, streamable HTTP, distroless, real tool)
-- [x] LICENSE.md present (commercial)
-- [x] Real B2B tool (`url.check`) shipping alongside the demo
-- [ ] Lemon Squeezy products created + checkout URLs wired
-- [ ] Stripe meter + webhook configured with live keys
-- [ ] OAuth provider (Auth0/Okta/Clerk/...) tenant + audience created
-- [ ] `dist/bindkit-<version>.zip` uploaded as the download asset
-- [ ] bindkit.dev DNS + deploy
-- [ ] Have a lawyer glance at LICENSE.md
+- bundled `url.check` tool with SSRF protections;
+- OAuth/JWKS support;
+- Stripe meter-event and webhook adapters;
+- per-key rate limiting and metering;
+- typed tool scaffolding scripts;
+- Apache-2.0 license.
 
-## 6. Then post it
+## 5. Announcement copy
 
-Once the boxes above are checked: **Show HN**, r/golang, r/mcp + the MCP Discord,
-a launch post on dev.to/X, Product Hunt, and the MCP server registries. The pitch
-that converts: "ship a *paid* MCP server this weekend — auth, Stripe billing,
-metering, rate limits, Docker, CI already done."
+Short version:
+
+> We open-sourced BindKit: a Go starter kit for building production-shaped MCP
+> servers. It includes stdio/HTTP transports, auth, metering, quotas, rate
+> limits, Stripe usage hooks, Docker, CI, and an SSRF-guarded example tool.
+> Apache-2.0.
+
+Long version:
+
+> MCP makes tool wiring fast, but production teams still need auth, metering,
+> quotas, rate limits, billing hooks, deployment shape, and tests. BindKit is a
+> compact Go starter kit for that layer. Bring your tool logic; the server
+> plumbing is already wired.
+
+Good launch targets:
+
+- GitHub release;
+- Hacker News "Show HN";
+- r/golang;
+- r/mcp;
+- MCP community Discord/Slack spaces where self-promotion is allowed;
+- Dev.to or personal technical blog post;
+- LinkedIn/X from the maintainer account.
+
+## 6. Maintainer follow-up
+
+After launch:
+
+- triage installation friction first;
+- label good first issues;
+- keep the starter small;
+- require tests for auth, billing, transport, or SSRF-sensitive changes;
+- document any breaking config changes in release notes.

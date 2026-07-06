@@ -1,29 +1,47 @@
-# Bindkit
+# BindKit
 
-**Ship a monetizable MCP server this weekend.** Bindkit is a production-shaped Go
-starter kit for paid [MCP](https://modelcontextprotocol.io) servers — the auth,
-billing, metering, rate limiting, transport, logging, Docker, and CI are already
-wired. You write the tools.
+**Open-source Go starter kit for production-shaped MCP servers.**
+
+BindKit wires the infrastructure most MCP server projects need before the first
+real tool ships: JSON-RPC dispatch, stdio and HTTP transports, streamable HTTP,
+API-key or OAuth bearer auth, metering, quotas, rate limits, Stripe usage
+reporting, structured logging, Docker, and CI.
+
+You bring the tools. BindKit gives you the server shape.
 
 ```bash
-go test ./...                          # everything is tested
+go test ./...
 BINDKIT_TRANSPORT=http go run ./cmd/server
 ```
+
+## Why this exists
+
+MCP makes it easy to expose tools to agents. Production teams still need the
+boring controls around those tools:
+
+- who is allowed to call them;
+- how often they can be called;
+- how usage is metered;
+- how plan quotas are enforced;
+- how the server runs in CI, Docker, and hosted environments;
+- how logs avoid leaking secrets.
+
+BindKit is a compact reference implementation for that layer.
 
 ## What's in the box
 
 | Concern | Implementation |
-|---|---|
-| **MCP core** | JSON-RPC dispatch, tool registry, `initialize` / `tools/list` / `tools/call` |
-| **Transports** | stdio (desktop clients) + HTTP `/mcp`, with **streamable HTTP (SSE)** on `Accept: text/event-stream` |
-| **Auth** | static API keys **or** OAuth 2.1 bearer (JWT validated against your provider's JWKS) |
-| **Billing** | Stripe usage-based metering (batched meter events) + webhook signature verification |
-| **Rate limiting** | per-key token bucket with idle-bucket eviction |
-| **Metering** | per-key counters (in-memory; swap the `Store` for Redis) |
-| **Config** | typed env with loud, fail-fast validation |
-| **Logging** | `slog` JSON with a secret-redaction helper |
-| **Packaging** | distroless Docker (~8 MB), compose, Fly config, GitHub Actions CI |
-| **Tools** | `url.check` (a real, SSRF-guarded endpoint auditor) + `weather.current` demo |
+| --- | --- |
+| MCP core | JSON-RPC dispatch, tool registry, `initialize`, `tools/list`, `tools/call` |
+| Transports | stdio plus HTTP `/mcp`; streamable HTTP via SSE when `Accept: text/event-stream` is sent |
+| Auth | static API keys or OAuth bearer tokens validated against JWKS |
+| Billing hooks | plan quotas, in-memory usage store, Stripe meter-event reporting, webhook signature verification |
+| Rate limiting | per-key token bucket with idle-bucket eviction |
+| Metering | per-key counters; replace the `Store` interface for Redis or another backend |
+| Config | typed environment config with fail-fast validation |
+| Logging | `slog` JSON with a secret-redaction helper |
+| Packaging | distroless Docker image, compose file, Fly config, GitHub Actions CI |
+| Tools | `url.check` SSRF-guarded endpoint auditor plus `weather.current` demo |
 
 ## Quickstart
 
@@ -35,14 +53,14 @@ curl -s http://127.0.0.1:8080/mcp -H 'content-type: application/json' \
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
 ```
 
-Call the real tool:
+Call the real bundled tool:
 
 ```bash
 curl -s http://127.0.0.1:8080/mcp -H 'content-type: application/json' \
   -d '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"url.check","arguments":{"url":"https://example.com"}}}'
 ```
 
-Turn on auth, rate limits, and quota:
+Turn on auth, rate limits, and quotas:
 
 ```bash
 BINDKIT_TRANSPORT=http BINDKIT_AUTH_ENABLED=true \
@@ -54,48 +72,71 @@ go run ./cmd/server
 ## Add your own tool
 
 ```bash
-make new-tool name=invoice_lookup     # or scripts/new_tool.ps1 -Name invoice_lookup
+make new-tool name=invoice_lookup
+# or on Windows:
+pwsh scripts/new_tool.ps1 -Name invoice_lookup
 ```
 
-Scaffolds a typed handler, JSON schema, test file, and registry entry. Register
-it in `cmd/server/main.go`.
+The script scaffolds a typed handler, JSON schema, test file, and registry
+entry. Register the tool in `cmd/server/main.go`.
 
-## Going to production
+## Production notes
 
-The full env reference (OAuth provider, Stripe meter + webhook, deployment) and
-the launch + fulfillment runbook are in **[docs/go-live.md](docs/go-live.md)**.
-Key environment variables:
+Read:
+
+- [docs/clients.md](docs/clients.md) for stdio and HTTP client usage;
+- [docs/deploy.md](docs/deploy.md) for Docker, compose, and Fly;
+- [docs/pricing.md](docs/pricing.md) for quota and billing hooks;
+- [docs/testing.md](docs/testing.md) for test coverage;
+- [docs/go-live.md](docs/go-live.md) for the release checklist.
+
+Important environment variables:
 
 ```bash
-BINDKIT_AUTH_MODE=oauth                 # or "static"
-BINDKIT_OAUTH_ISSUER=...  BINDKIT_OAUTH_JWKS_URL=...  BINDKIT_OAUTH_AUDIENCE=...
-STRIPE_SECRET_KEY=sk_...  STRIPE_METER_EVENT=tool_call  STRIPE_WEBHOOK_SECRET=whsec_...
+BINDKIT_AUTH_MODE=oauth
+BINDKIT_OAUTH_ISSUER=...
+BINDKIT_OAUTH_JWKS_URL=...
+BINDKIT_OAUTH_AUDIENCE=...
+STRIPE_SECRET_KEY=sk_...
+STRIPE_METER_EVENT=tool_call
+STRIPE_WEBHOOK_SECRET=whsec_...
 ```
 
 Build the image:
 
 ```bash
-docker build -t bindkit .               # distroless, ~8 MB
+docker build -t bindkit .
 ```
 
 ## Layout
 
-```
+```text
 cmd/server/        entrypoint + graceful shutdown
 internal/
-  auth/            static keys + OAuth 2.1 (JWKS) authenticators
+  auth/            static keys + OAuth bearer-token authenticators
   billing/         quota gate, Stripe meter reporter, webhook verification
   config/          typed env + validation
   logging/         slog redaction helper
   mcp/             JSON-RPC, registry, dispatcher
-  metering/        counter Store (memory; Redis-ready)
+  metering/        counter Store
   ratelimit/       token bucket + eviction
   server/          stdio + HTTP transports, middleware chain
-tools/             url_check (real) + example_weather (demo)
+tools/             url_check real tool + example_weather demo
 docs/              clients, pricing, deploy, testing, go-live
 ```
 
-## License
+## Open-source status
 
-Commercial — see [LICENSE.md](LICENSE.md). You keep 100% of what you build and
-sell with it; you may not resell the kit itself.
+BindKit is licensed under the [Apache License 2.0](LICENSE).
+
+See:
+
+- [NOTICE](NOTICE) for attribution and trademark notes;
+- [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for direct dependency notices;
+- [CONTRIBUTING.md](CONTRIBUTING.md) for contribution rules;
+- [SECURITY.md](SECURITY.md) for vulnerability reporting.
+
+## What BindKit is not
+
+BindKit is not a hosted platform, registry, or compliance product. It is a
+starter kit and reference server for teams building their own MCP servers.
