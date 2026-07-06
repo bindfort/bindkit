@@ -1,5 +1,5 @@
 # ---- build: static, stripped binary ----
-FROM golang:1.24-alpine AS build
+FROM golang:1.24-alpine@sha256:8bee1901f1e530bfb4a7850aa7a479d17ae3a18beb6e09064ed54cfd245b7191 AS build
 WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
@@ -12,7 +12,7 @@ RUN go test ./... \
 # ---- runtime: distroless static, nonroot ----
 # gcr.io/distroless/static is a ~2 MB base with no shell or package manager;
 # combined with the stripped static binary the final image is well under 20 MB.
-FROM gcr.io/distroless/static:nonroot
+FROM gcr.io/distroless/static:nonroot@sha256:963fa6c544fe5ce420f1f54fb88b6fb01479f054c8056d0f74cc2c6000df5240
 COPY --from=build /out/bindkit /usr/local/bin/bindkit
 USER nonroot:nonroot
 EXPOSE 8080
