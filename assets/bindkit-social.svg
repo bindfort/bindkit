@@ -1,57 +1,143 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-labelledby="title desc">
   <title id="title">BindKit social preview</title>
-  <desc id="desc">BindKit, an open-source Go starter kit for production-shaped MCP servers.</desc>
+  <desc id="desc">BindKit, an open-source Go starter kit for production-shaped MCP servers with auth, quotas, metering, and streamable HTTP.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#101828"/>
-      <stop offset="0.55" stop-color="#133238"/>
-      <stop offset="1" stop-color="#0f172a"/>
+      <stop offset="0" stop-color="#07111f"/>
+      <stop offset="0.42" stop-color="#0d2a2c"/>
+      <stop offset="1" stop-color="#121826"/>
     </linearGradient>
-    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f8fafc"/>
+      <stop offset="1" stop-color="#e8eef5"/>
+    </linearGradient>
+    <linearGradient id="terminal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#101827"/>
+      <stop offset="1" stop-color="#172033"/>
+    </linearGradient>
+    <linearGradient id="greenBlue" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#22c55e"/>
       <stop offset="1" stop-color="#38bdf8"/>
     </linearGradient>
-    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#020617" flood-opacity="0.32"/>
+    <linearGradient id="amberGreen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f59e0b"/>
+      <stop offset="1" stop-color="#84cc16"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#334155" stroke-width="1" opacity="0.28"/>
+    </pattern>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="22" stdDeviation="18" flood-color="#020617" flood-opacity="0.34"/>
     </filter>
+    <filter id="smallShadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="10" stdDeviation="8" flood-color="#020617" flood-opacity="0.22"/>
+    </filter>
+    <style>
+      .sans { font-family: Inter, Segoe UI, Arial, sans-serif; }
+      .mono { font-family: Cascadia Mono, Consolas, Menlo, monospace; }
+      .label { fill: #64748b; font-size: 17px; font-weight: 700; letter-spacing: 0; }
+      .small { fill: #94a3b8; font-size: 15px; font-weight: 600; letter-spacing: 0; }
+      .code { fill: #cbd5e1; font-size: 18px; letter-spacing: 0; }
+    </style>
   </defs>
 
   <rect width="1280" height="640" fill="url(#bg)"/>
-  <path d="M0 480 C180 420 300 548 490 486 C710 414 790 264 1015 298 C1140 317 1212 368 1280 346 L1280 640 L0 640 Z" fill="#0b1220" opacity="0.72"/>
-  <path d="M118 138 H452" stroke="#334155" stroke-width="2"/>
-  <path d="M118 502 H514" stroke="#334155" stroke-width="2"/>
-  <path d="M834 122 H1146" stroke="#334155" stroke-width="2"/>
+  <rect width="1280" height="640" fill="url(#grid)" opacity="0.55"/>
+  <path d="M0 505 C165 438 285 560 475 500 C684 434 774 286 1006 318 C1145 337 1208 384 1280 355 L1280 640 L0 640 Z" fill="#07111f" opacity="0.76"/>
+  <path d="M42 108 C246 42 368 72 520 108" fill="none" stroke="#22c55e" stroke-width="2" opacity="0.25"/>
+  <path d="M761 82 C948 34 1112 56 1236 136" fill="none" stroke="#38bdf8" stroke-width="2" opacity="0.22"/>
 
-  <g filter="url(#soft)">
-    <rect x="760" y="172" width="340" height="260" rx="26" fill="#f8fafc"/>
-    <rect x="790" y="202" width="280" height="42" rx="10" fill="#e2e8f0"/>
-    <rect x="790" y="270" width="120" height="92" rx="16" fill="#dcfce7"/>
-    <rect x="934" y="270" width="136" height="92" rx="16" fill="#e0f2fe"/>
-    <rect x="790" y="386" width="280" height="16" rx="8" fill="#cbd5e1"/>
+  <g transform="translate(72 72)">
+    <text class="sans" x="0" y="0" fill="#f8fafc" font-size="78" font-weight="850">BindKit</text>
+    <text class="sans" x="3" y="48" fill="#cbd5e1" font-size="27" font-weight="550">Production-shaped MCP servers in Go</text>
+    <g transform="translate(3 82)">
+      <rect x="0" y="0" width="132" height="34" rx="17" fill="#dcfce7"/>
+      <text class="sans" x="19" y="23" fill="#166534" font-size="15" font-weight="800">Apache-2.0</text>
+      <rect x="150" y="0" width="106" height="34" rx="17" fill="#e0f2fe"/>
+      <text class="sans" x="171" y="23" fill="#075985" font-size="15" font-weight="800">Go + MCP</text>
+      <rect x="274" y="0" width="154" height="34" rx="17" fill="#fef3c7"/>
+      <text class="sans" x="294" y="23" fill="#92400e" font-size="15" font-weight="800">Auth + quotas</text>
+    </g>
   </g>
 
-  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M620 224 C694 224 694 302 760 302" stroke="url(#accent)" stroke-width="12"/>
-    <path d="M620 352 C688 352 700 302 760 302" stroke="#94a3b8" stroke-width="8" opacity="0.72"/>
-    <path d="M620 480 C710 480 692 376 760 376" stroke="#94a3b8" stroke-width="8" opacity="0.72"/>
+  <g filter="url(#shadow)" transform="translate(72 252)">
+    <rect x="0" y="0" width="462" height="238" rx="18" fill="url(#terminal)" stroke="#334155"/>
+    <rect x="0" y="0" width="462" height="42" rx="18" fill="#0b1220"/>
+    <circle cx="25" cy="21" r="6" fill="#ef4444"/>
+    <circle cx="47" cy="21" r="6" fill="#f59e0b"/>
+    <circle cx="69" cy="21" r="6" fill="#22c55e"/>
+    <text class="mono" x="98" y="27" fill="#94a3b8" font-size="15">bindkit quickstart</text>
+    <text class="mono code" x="24" y="78">$ make new-tool name=invoice_lookup</text>
+    <text class="mono code" x="24" y="116">$ BINDKIT_TRANSPORT=http go run ./cmd/server</text>
+    <text class="mono" x="24" y="154" fill="#22c55e" font-size="18">POST /mcp tools/call invoice_lookup.run</text>
+    <text class="mono" x="24" y="192" fill="#38bdf8" font-size="18">auth=true quota=free:100 metering=memory</text>
   </g>
 
-  <g filter="url(#soft)">
-    <rect x="120" y="166" width="500" height="92" rx="20" fill="#f8fafc"/>
-    <rect x="120" y="304" width="500" height="92" rx="20" fill="#f8fafc"/>
-    <rect x="120" y="442" width="500" height="92" rx="20" fill="#f8fafc"/>
-    <circle cx="170" cy="212" r="18" fill="#22c55e"/>
-    <circle cx="170" cy="350" r="18" fill="#38bdf8"/>
-    <circle cx="170" cy="488" r="18" fill="#f59e0b"/>
-    <rect x="214" y="194" width="210" height="14" rx="7" fill="#64748b"/>
-    <rect x="214" y="220" width="330" height="12" rx="6" fill="#cbd5e1"/>
-    <rect x="214" y="332" width="260" height="14" rx="7" fill="#64748b"/>
-    <rect x="214" y="358" width="286" height="12" rx="6" fill="#cbd5e1"/>
-    <rect x="214" y="470" width="230" height="14" rx="7" fill="#64748b"/>
-    <rect x="214" y="496" width="310" height="12" rx="6" fill="#cbd5e1"/>
+  <g transform="translate(622 116)">
+    <g filter="url(#shadow)">
+      <rect x="0" y="0" width="538" height="392" rx="26" fill="url(#panel)"/>
+      <rect x="30" y="30" width="478" height="64" rx="16" fill="#0f172a"/>
+      <text class="mono" x="55" y="70" fill="#d9f99d" font-size="22">MCP control plane</text>
+
+      <g transform="translate(44 126)">
+        <rect x="0" y="0" width="136" height="88" rx="16" fill="#ecfeff" stroke="#bae6fd"/>
+        <text class="label sans" x="22" y="34">stdio</text>
+        <text class="small sans" x="22" y="60">desktop</text>
+        <circle cx="112" cy="44" r="11" fill="#38bdf8"/>
+      </g>
+
+      <g transform="translate(44 250)">
+        <rect x="0" y="0" width="136" height="88" rx="16" fill="#f0fdf4" stroke="#bbf7d0"/>
+        <text class="label sans" x="22" y="34">HTTP /mcp</text>
+        <text class="small sans" x="22" y="60">hosted</text>
+        <circle cx="112" cy="44" r="11" fill="#22c55e"/>
+      </g>
+
+      <g transform="translate(228 176)">
+        <circle cx="62" cy="62" r="62" fill="url(#greenBlue)"/>
+        <circle cx="62" cy="62" r="44" fill="#f8fafc" opacity="0.95"/>
+        <text class="sans" x="31" y="57" fill="#0f172a" font-size="17" font-weight="850">JSON</text>
+        <text class="sans" x="30" y="79" fill="#0f172a" font-size="17" font-weight="850">RPC</text>
+      </g>
+
+      <g transform="translate(398 112)">
+        <rect x="0" y="0" width="118" height="72" rx="14" fill="#fff7ed" stroke="#fed7aa"/>
+        <text class="label sans" x="20" y="31">auth</text>
+        <text class="small sans" x="20" y="54">keys/OAuth</text>
+      </g>
+      <g transform="translate(398 202)">
+        <rect x="0" y="0" width="118" height="72" rx="14" fill="#f5f3ff" stroke="#ddd6fe"/>
+        <text class="label sans" x="20" y="31">quota</text>
+        <text class="small sans" x="20" y="54">plans</text>
+      </g>
+      <g transform="translate(398 292)">
+        <rect x="0" y="0" width="118" height="72" rx="14" fill="#ecfccb" stroke="#d9f99d"/>
+        <text class="label sans" x="20" y="31">meter</text>
+        <text class="small sans" x="20" y="54">Stripe</text>
+      </g>
+
+      <path d="M180 170 C215 170 223 218 242 224" fill="none" stroke="#38bdf8" stroke-width="5" stroke-linecap="round"/>
+      <path d="M180 294 C216 294 223 258 242 252" fill="none" stroke="#22c55e" stroke-width="5" stroke-linecap="round"/>
+      <path d="M352 232 C377 164 383 148 398 148" fill="none" stroke="#f59e0b" stroke-width="5" stroke-linecap="round"/>
+      <path d="M352 238 C374 238 382 238 398 238" fill="none" stroke="#8b5cf6" stroke-width="5" stroke-linecap="round"/>
+      <path d="M352 246 C377 314 383 328 398 328" fill="none" stroke="#84cc16" stroke-width="5" stroke-linecap="round"/>
+    </g>
   </g>
 
-  <text x="120" y="110" fill="#f8fafc" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="76" font-weight="800">BindKit</text>
-  <text x="122" y="590" fill="#cbd5e1" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="30" font-weight="500">Open-source Go starter kit for production-shaped MCP servers</text>
-  <text x="880" y="506" fill="#d9f99d" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="24" font-weight="700">auth . quotas . metering . MCP</text>
+  <g filter="url(#smallShadow)" transform="translate(72 526)">
+    <rect x="0" y="0" width="266" height="54" rx="14" fill="#f8fafc"/>
+    <circle cx="30" cy="27" r="10" fill="#22c55e"/>
+    <text class="sans" x="52" y="34" fill="#0f172a" font-size="18" font-weight="800">url.check SSRF guard</text>
+
+    <rect x="286" y="0" width="210" height="54" rx="14" fill="#f8fafc"/>
+    <circle cx="316" cy="27" r="10" fill="#38bdf8"/>
+    <text class="sans" x="338" y="34" fill="#0f172a" font-size="18" font-weight="800">streamable HTTP</text>
+
+    <rect x="516" y="0" width="236" height="54" rx="14" fill="#f8fafc"/>
+    <circle cx="546" cy="27" r="10" fill="#f59e0b"/>
+    <text class="sans" x="568" y="34" fill="#0f172a" font-size="18" font-weight="800">production controls</text>
+  </g>
+
+  <text class="sans" x="882" y="568" fill="#cbd5e1" font-size="22" font-weight="650">Bring your tools.</text>
+  <text class="sans" x="882" y="596" fill="#cbd5e1" font-size="22" font-weight="650">Ship the server.</text>
 </svg>
