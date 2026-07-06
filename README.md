@@ -20,6 +20,50 @@ go test ./...
 BINDKIT_TRANSPORT=http go run ./cmd/server
 ```
 
+## Build your MCP server in 5 steps
+
+1. Run BindKit:
+
+```bash
+BINDKIT_TRANSPORT=http go run ./cmd/server
+```
+
+2. List MCP tools:
+
+```bash
+curl -s http://127.0.0.1:8080/mcp -H 'content-type: application/json' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+```
+
+3. Scaffold your tool:
+
+```bash
+make new-tool name=invoice_lookup
+# Windows:
+pwsh scripts/new_tool.ps1 -Name invoice_lookup
+```
+
+4. Register it in `cmd/server/main.go`:
+
+```go
+invoice_lookup "github.com/bindfort/bindkit/tools/invoice_lookup"
+```
+
+```go
+invoice_lookup.Register,
+```
+
+5. Run it behind production controls:
+
+```bash
+BINDKIT_TRANSPORT=http BINDKIT_AUTH_ENABLED=true \
+BINDKIT_API_KEYS=dev-key:free BINDKIT_BILLING_ENABLED=true \
+BINDKIT_PLAN_QUOTAS=free:100 \
+go run ./cmd/server
+```
+
+Full walkthrough: [docs/build-your-mcp-server.md](docs/build-your-mcp-server.md).
+
 ## Why this exists
 
 MCP makes it easy to expose tools to agents. Production teams still need the
@@ -49,17 +93,9 @@ BindKit is a compact reference implementation for that layer.
 | Packaging | distroless Docker image, compose file, Fly config, GitHub Actions CI |
 | Tools | `url.check` SSRF-guarded endpoint auditor plus `weather.current` demo |
 
-## Quickstart
+## Try the bundled tools
 
-Run over HTTP and list tools:
-
-```bash
-BINDKIT_TRANSPORT=http go run ./cmd/server
-curl -s http://127.0.0.1:8080/mcp -H 'content-type: application/json' \
-  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
-```
-
-Call the real bundled tool:
+Call the SSRF-guarded URL checker:
 
 ```bash
 curl -s http://127.0.0.1:8080/mcp -H 'content-type: application/json' \
@@ -90,6 +126,7 @@ entry. Register the tool in `cmd/server/main.go`.
 
 Read:
 
+- [docs/build-your-mcp-server.md](docs/build-your-mcp-server.md) for the first custom tool path;
 - [docs/clients.md](docs/clients.md) for stdio and HTTP client usage;
 - [docs/deploy.md](docs/deploy.md) for Docker, compose, and Fly;
 - [docs/pricing.md](docs/pricing.md) for quota and billing hooks;
