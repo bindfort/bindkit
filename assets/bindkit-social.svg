@@ -61,16 +61,17 @@
   </g>
 
   <g filter="url(#shadow)" transform="translate(72 252)">
-    <rect x="0" y="0" width="462" height="238" rx="18" fill="url(#terminal)" stroke="#334155"/>
-    <rect x="0" y="0" width="462" height="42" rx="18" fill="#0b1220"/>
+    <rect x="0" y="0" width="494" height="238" rx="18" fill="url(#terminal)" stroke="#334155"/>
+    <rect x="0" y="0" width="494" height="42" rx="18" fill="#0b1220"/>
     <circle cx="25" cy="21" r="6" fill="#ef4444"/>
     <circle cx="47" cy="21" r="6" fill="#f59e0b"/>
     <circle cx="69" cy="21" r="6" fill="#22c55e"/>
     <text class="mono" x="98" y="27" fill="#94a3b8" font-size="15">bindkit quickstart</text>
-    <text class="mono code" x="24" y="78">$ make new-tool name=invoice_lookup</text>
-    <text class="mono code" x="24" y="116">$ BINDKIT_TRANSPORT=http go run ./cmd/server</text>
-    <text class="mono" x="24" y="154" fill="#22c55e" font-size="18">POST /mcp tools/call invoice_lookup.run</text>
-    <text class="mono" x="24" y="192" fill="#38bdf8" font-size="18">auth=true quota=free:100 metering=memory</text>
+    <text class="mono code" x="24" y="76">$ make new-tool name=invoice</text>
+    <text class="mono code" x="24" y="110">$ BINDKIT_TRANSPORT=http</text>
+    <text class="mono code" x="24" y="140">$ go run ./cmd/server</text>
+    <text class="mono" x="24" y="174" fill="#22c55e" font-size="18">POST /mcp invoice.run</text>
+    <text class="mono" x="24" y="208" fill="#38bdf8" font-size="18">auth=true quota=free:100 meter=on</text>
   </g>
 
   <g transform="translate(622 116)">
