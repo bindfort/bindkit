@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Packages the Bindkit source into a clean, customer-ready zip in dist/.
+# Packages the BindKit source into a clean release archive in dist/.
 # Works on macOS/Linux and Windows git-bash. Requires `zip`.
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -12,10 +12,10 @@ rm -f "$out"
 echo "Running tests before packaging..."
 go test ./... >/dev/null
 
-zip -r "$out" . \
-  -x '*/.git/*' '.git/*' 'dist/*' '*.exe' '*.log' \
-     'agent.md' 'handoff.json' 'tasks.md' 'architecture-map.html' \
-     'landingpage/*' '*/.DS_Store' >/dev/null
+git ls-files --cached --others --exclude-standard -z |
+  while IFS= read -r -d '' file; do
+    [ -f "$file" ] && zip -q "$out" "$file"
+  done
 
 echo "packaged -> $out"
 unzip -l "$out" | tail -1

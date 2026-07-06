@@ -1,6 +1,5 @@
 #Requires -Version 5
-# Packages the Bindkit source into a clean, customer-ready zip in dist/.
-# Excludes git, build output, logs, and internal dev-process files.
+# Packages the BindKit source into a clean release archive in dist/.
 $ErrorActionPreference = 'Stop'
 Set-Location (Join-Path $PSScriptRoot '..')
 
@@ -16,12 +15,13 @@ if ($LASTEXITCODE -ne 0) { throw "tests failed; not packaging" }
 $staging = Join-Path $env:TEMP "bindkit-pkg-$version"
 if (Test-Path $staging) { Remove-Item -Recurse -Force $staging }
 
-# /XD excludes dirs, /XF excludes files. robocopy exit codes < 8 are success.
-robocopy . $staging /E `
-  /XD .git dist landingpage .github\..cache `
-  /XF *.exe *.log agent.md handoff.json tasks.md architecture-map.html `
-  | Out-Null
-if ($LASTEXITCODE -ge 8) { throw "robocopy failed ($LASTEXITCODE)" }
+$files = git ls-files --cached --others --exclude-standard
+foreach ($file in $files) {
+  if (-not (Test-Path -LiteralPath $file -PathType Leaf)) { continue }
+  $target = Join-Path $staging $file
+  New-Item -ItemType Directory -Force (Split-Path $target) | Out-Null
+  Copy-Item -LiteralPath $file -Destination $target
+}
 
 Compress-Archive -Path "$staging/*" -DestinationPath $out -Force
 Remove-Item -Recurse -Force $staging
