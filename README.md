@@ -1,5 +1,11 @@
 # BindKit
 
+[![CI](https://github.com/bindfort/bindkit/actions/workflows/ci.yml/badge.svg)](https://github.com/bindfort/bindkit/actions/workflows/ci.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/bindfort/bindkit/badge)](https://scorecard.dev/viewer/?uri=github.com/bindfort/bindkit)
+[![License](https://img.shields.io/github/license/bindfort/bindkit)](LICENSE)
+
+![BindKit social preview](assets/bindkit-social.svg)
+
 **Open-source Go starter kit for production-shaped MCP servers.**
 
 BindKit wires the infrastructure most MCP server projects need before the first
