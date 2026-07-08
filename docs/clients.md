@@ -13,6 +13,13 @@ Use stdio when an MCP client starts BindKit directly.
 BINDKIT_TRANSPORT=stdio go run ./cmd/server
 ```
 
+PowerShell:
+
+```powershell
+$env:BINDKIT_TRANSPORT = "stdio"
+go run ./cmd/server
+```
+
 The server reads one JSON-RPC request per line from stdin and writes one
 JSON-RPC response per line to stdout.
 
@@ -38,6 +45,14 @@ Use HTTP when hosting the MCP server.
 
 ```bash
 BINDKIT_TRANSPORT=http BINDKIT_HTTP_ADDR=:8080 go run ./cmd/server
+```
+
+PowerShell:
+
+```powershell
+$env:BINDKIT_TRANSPORT = "http"
+$env:BINDKIT_HTTP_ADDR = "127.0.0.1:8080"
+go run ./cmd/server
 ```
 
 Health check:

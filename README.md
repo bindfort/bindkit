@@ -15,10 +15,14 @@ reporting, structured logging, Docker, and CI.
 
 You bring the tools. BindKit gives you the server shape.
 
-```bash
-go test ./...
-BINDKIT_TRANSPORT=http go run ./cmd/server
-```
+## Requirements
+
+- Go 1.24 or newer;
+- `curl` for the HTTP examples;
+- Docker only if you want to build the container image.
+
+The HTTP examples use two terminals: keep the server running in one terminal and
+send MCP requests from another.
 
 ## Build your MCP server in 5 steps
 
@@ -28,12 +32,20 @@ BINDKIT_TRANSPORT=http go run ./cmd/server
 BINDKIT_TRANSPORT=http go run ./cmd/server
 ```
 
+On Windows PowerShell:
+
+```powershell
+.\run-local.ps1
+```
+
 2. List MCP tools:
 
 ```bash
 curl -s http://127.0.0.1:8080/mcp -H 'content-type: application/json' \
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
 ```
+
+You should see `url.check` and `weather.current`.
 
 3. Scaffold your tool:
 
@@ -43,7 +55,7 @@ make new-tool name=invoice_lookup
 pwsh scripts/new_tool.ps1 -Name invoice_lookup
 ```
 
-4. Register it in `cmd/server/main.go`:
+4. Stop the server with `Ctrl+C`, then register the tool in `cmd/server/main.go`:
 
 ```go
 invoice_lookup "github.com/bindfort/bindkit/tools/invoice_lookup"
@@ -53,7 +65,9 @@ invoice_lookup "github.com/bindfort/bindkit/tools/invoice_lookup"
 invoice_lookup.Register,
 ```
 
-5. Run it behind production controls:
+Then run `go test ./...`.
+
+5. Restart it behind production controls:
 
 ```bash
 BINDKIT_TRANSPORT=http BINDKIT_AUTH_ENABLED=true \
@@ -63,6 +77,8 @@ go run ./cmd/server
 ```
 
 Full walkthrough: [docs/build-your-mcp-server.md](docs/build-your-mcp-server.md).
+Connecting to real APIs, databases, or SaaS services:
+[docs/connect-services.md](docs/connect-services.md).
 
 ## Why this exists
 
@@ -102,6 +118,9 @@ curl -s http://127.0.0.1:8080/mcp -H 'content-type: application/json' \
   -d '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"url.check","arguments":{"url":"https://example.com"}}}'
 ```
 
+Expected result: a text report with the HTTP status code, latency, and security
+headers present or missing.
+
 Turn on auth, rate limits, and quotas:
 
 ```bash
@@ -111,22 +130,12 @@ BINDKIT_PLAN_QUOTAS=free:100,pro:100000 \
 go run ./cmd/server
 ```
 
-## Add your own tool
-
-```bash
-make new-tool name=invoice_lookup
-# or on Windows:
-pwsh scripts/new_tool.ps1 -Name invoice_lookup
-```
-
-The script scaffolds a typed handler, JSON schema, test file, and registry
-entry. Register the tool in `cmd/server/main.go`.
-
 ## Production notes
 
 Read:
 
 - [docs/build-your-mcp-server.md](docs/build-your-mcp-server.md) for the first custom tool path;
+- [docs/connect-services.md](docs/connect-services.md) for wiring tools to real services;
 - [docs/clients.md](docs/clients.md) for stdio and HTTP client usage;
 - [docs/deploy.md](docs/deploy.md) for Docker, compose, and Fly;
 - [docs/pricing.md](docs/pricing.md) for quota and billing hooks;
