@@ -82,6 +82,11 @@ The scaffold includes:
 Edit `tools/invoice_lookup/invoice_lookup.go` when you are ready to replace the
 placeholder handler with real tool logic.
 
+If your tool needs to talk to a real API, database, or SaaS product, read
+[connect-services.md](connect-services.md). The short version: keep service
+tokens in environment variables, validate inputs before calling the service, and
+return only the small answer the agent needs.
+
 ## 4. Register the tool
 
 Open `cmd/server/main.go`. In the import block, add:

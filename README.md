@@ -77,6 +77,8 @@ go run ./cmd/server
 ```
 
 Full walkthrough: [docs/build-your-mcp-server.md](docs/build-your-mcp-server.md).
+Connecting to real APIs, databases, or SaaS services:
+[docs/connect-services.md](docs/connect-services.md).
 
 ## Why this exists
 
@@ -133,6 +135,7 @@ go run ./cmd/server
 Read:
 
 - [docs/build-your-mcp-server.md](docs/build-your-mcp-server.md) for the first custom tool path;
+- [docs/connect-services.md](docs/connect-services.md) for wiring tools to real services;
 - [docs/clients.md](docs/clients.md) for stdio and HTTP client usage;
 - [docs/deploy.md](docs/deploy.md) for Docker, compose, and Fly;
 - [docs/pricing.md](docs/pricing.md) for quota and billing hooks;
